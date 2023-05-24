@@ -57,7 +57,7 @@ namespace _3dProjectionSelection.Scripts.Viewport
             go.transform.position = v;
         }
         
-        public Vector3[] GetCameraBounds()
+        Vector3[] GetCameraBounds()
         {
             Vector3[] bounds = new Vector3[4];
 
@@ -113,18 +113,30 @@ namespace _3dProjectionSelection.Scripts.Viewport
                 leftTopPoint,rightTopPoint,rightBottomPoint,leftBottomPoint,
                 leftTopPointInProjection,rightTopPointInProjection,rightBottomPointInProjection,leftBottomPointInProjection,
             };
-            
-            // CreateDebugPoint(leftTopPoint, "Left-Top-Point");
-            // CreateDebugPoint(leftBottomPoint, "Left-Bottom-Point");
-            // CreateDebugPoint(rightTopPoint, "Right-Top-Point");
-            // CreateDebugPoint(rightBottomPoint, "Right-Bottom-Point");
-            //
-            // CreateDebugPoint(leftTopPointInProjection, "Left-Top-pp");
-            // CreateDebugPoint(leftBottomPointInProjection, "Left-Bottom-pp");
-            // CreateDebugPoint(rightTopPointInProjection, "Right-Top-pp");
-            // CreateDebugPoint(rightBottomPointInProjection, "Right-Bottom-pp");
 
-           
+            // if (debug)
+            // {
+            //     CreateDebugPoint(leftTopPoint, "Left-Top-Point");
+            //     CreateDebugPoint(leftBottomPoint, "Left-Bottom-Point");
+            //     CreateDebugPoint(rightTopPoint, "Right-Top-Point");
+            //     CreateDebugPoint(rightBottomPoint, "Right-Bottom-Point");
+            //
+            //     CreateDebugPoint(leftTopPointInProjection, "Left-Top-pp");
+            //     CreateDebugPoint(leftBottomPointInProjection, "Left-Bottom-pp");
+            //     CreateDebugPoint(rightTopPointInProjection, "Right-Top-pp");
+            //     CreateDebugPoint(rightBottomPointInProjection, "Right-Bottom-pp");
+            //     
+            //     Mesh m = new Mesh();
+            //     m.vertices = vertices;
+            //     GameObject n = new GameObject("DebugColliderProjection");
+            //
+            //     MeshFilter mf = n.AddComponent<MeshFilter>();
+            //     MeshRenderer mr = n.AddComponent<MeshRenderer>();
+            //     mf.mesh = m;
+            //
+            //     mr.material = debugMat;
+            // }
+            
             // print(leftTopPoint);
             // print(rightTopPoint);
             // print(rightBottomPoint);
@@ -135,14 +147,7 @@ namespace _3dProjectionSelection.Scripts.Viewport
             // print(leftBottomPointInProjection);
             
 
-            // Mesh m = new Mesh();
-            // GameObject n = new GameObject("DebugColliderProjection");
-            //
-            // MeshFilter mf = n.AddComponent<MeshFilter>();
-            // MeshRenderer mr = n.AddComponent<MeshRenderer>();
-            // mf.mesh = m;
-            //
-            // mr.material = mat;
+            
 
 
             return vertices;
@@ -150,7 +155,7 @@ namespace _3dProjectionSelection.Scripts.Viewport
 
         void CreateDebugPoint(Vector3 v, string name)
         {
-            GameObject debug = GameObject.Instantiate(debugSphere);
+            GameObject debug = Instantiate(debugSphere);
             debug.name = name;
             debug.transform.position = v;
         }

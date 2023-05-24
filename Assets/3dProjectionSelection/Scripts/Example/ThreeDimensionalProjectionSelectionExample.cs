@@ -1,93 +1,53 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using _3dProjectionSelection.Scripts.Math;
-using _3dProjectionSelection.Scripts.Physics;
-using _3dProjectionSelection.Scripts.Viewport;
+using _3dProjectionSelection.Scripts.Manager;
+using _3dProjectionSelection.Scripts.Model;
 using UnityEngine;
 
 namespace _3dProjectionSelection.Scripts.Example
 {
     public class ThreeDimensionalProjectionSelectionExample : MonoBehaviour
     {
-        public GameObject selectionRectPanel; // Rect selection is a panel
-        RectTransform rt; // transform for the rect selection
-
-
-        public ViewportToWorldPoint ViewportToWorldPoint;
-
-        Vector2 _startDragMousePos = new Vector2();
-
-        public Material debugMat;
-
-        private static KeyCode holdSelectKey = KeyCode.LeftControl;
-
+        [SerializeField] private ThreeDProjectionSelectorManager projSelectorManager;
+        
+        public List<GameObject> candidates;
+        
+        
+        
         private void Start()
         {
-            rt = selectionRectPanel.GetComponent<RectTransform>();
+            projSelectorManager.OnInitRectSelectionCalculation += OnInitRectSelectionCalculation;
+            projSelectorManager.OnSelectionDone += OnSelectionDone;
         }
 
         private void Update()
         {
-            // When i start my rect selection
-            if (Input.GetKey(holdSelectKey) && Input.GetMouseButtonDown(0))
+            if (Input.GetKeyDown(KeyCode.T))
             {
-                _startDragMousePos = Input.mousePosition;
-                selectionRectPanel.SetActive(true);
-                rt.transform.position = Input.mousePosition;
+                projSelectorManager.enabled = !projSelectorManager.enabled;
             }
+        }
 
-            // When i hold my selection
-            if (Input.GetKey(holdSelectKey) && Input.GetMouseButton(0))
+        /// <summary>
+        /// When Rect Selection area is settled, define the rect selection candidates.
+        /// </summary>
+        private void OnInitRectSelectionCalculation()
+        {
+            projSelectorManager.CollectingElementsInProjectionCalculation(candidates);
+        }
+        
+        /// <summary>
+        /// When the rect selection is done, do whatever you want with the result.
+        /// </summary>
+        /// <param name="rectSelectionResult"></param>
+        private void OnSelectionDone(RectSelectionOutput rectSelectionResult)
+        {
+            SetGameObjectsColor(candidates, Color.gray);
+
+            foreach (int indexOfCandidate in rectSelectionResult.CandidatesInProjections)
             {
-                Vector2 diff = (Vector2)Input.mousePosition - _startDragMousePos;
-                Vector2 delta = new Vector2(diff.x, diff.y);
-                rt.sizeDelta = delta;
-                rt.transform.position = _startDragMousePos + (delta / 2);
-            }
-
-            if (Input.GetKey(holdSelectKey) && Input.GetMouseButtonUp(0))
-            {
-                // When the rect selection is determined
-
-                List<GeoPoint> geoPoints = new List<GeoPoint>();
-
-                Vector2 currentMousePos = Input.mousePosition;
-
-                int a = 0;
-                float startZ = 1;
-
-                foreach (Vector3 v in ViewportToWorldPoint.GetCameraProjectionBoundsSelection(_startDragMousePos,
-                    currentMousePos, startZ))
-                {
-                    geoPoints.Add(new GeoPoint(v));
-
-                    // var debugSphere = Instantiate(DebugBounds.Singleton.debugSphere, v, Camera.main.transform.rotation);
-                    // debugSphere.name = "CamPoint " + a;
-
-                    a++;
-                }
-
-                GeoPolygonProc geoPolygonProcess = new GeoPolygonProc(new GeoPolygon(geoPoints));
-
-                List<GameObject> candidates = new List<GameObject>();
-
-                foreach (Transform child in GameObject.Find("Objects").transform)
-                {
-                    candidates.Add(child.gameObject);
-                }
-                
-
-                SetGameObjectsColor(candidates, Color.gray);
-
-                var candidatesInProjection = 
-                    SelectionCollector.CollectFromPolygonProcBoundingBox(geoPolygonProcess, 
-                        candidates.Select(go => go.GetComponent<GameObjectWithCollider>()).ToList());
-
-                Debug.Log("candidates in projection " + candidatesInProjection.Count);
-
-                SetGameObjectsColor(candidatesInProjection, Color.magenta);
-                
-                selectionRectPanel.SetActive(false);
+                SetGameObjectColor(candidates[indexOfCandidate], Color.magenta);
             }
         }
 
@@ -95,11 +55,16 @@ namespace _3dProjectionSelection.Scripts.Example
         {
             foreach (var go in list)
             {
-                var meshRenderer = go.GetComponent<MeshRenderer>();
-                if (meshRenderer != null)
-                {
-                    meshRenderer.material.color = c;
-                }
+                SetGameObjectColor(go, c);
+            }
+        }
+
+        void SetGameObjectColor(GameObject go, Color c)
+        {
+            var meshRenderer = go.GetComponent<MeshRenderer>();
+            if (meshRenderer)
+            {
+                meshRenderer.material.color = c;
             }
         }
     }
