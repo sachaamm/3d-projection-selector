@@ -13,8 +13,6 @@ namespace _3dProjectionSelection.Scripts.Example
         
         public List<GameObject> candidates;
         
-        
-        
         private void Start()
         {
             projSelectorManager.OnInitRectSelectionCalculation += OnInitRectSelectionCalculation;
